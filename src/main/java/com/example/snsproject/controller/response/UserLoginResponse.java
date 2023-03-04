@@ -1,4 +1,4 @@
-package com.example.snsproject.controller.request;
+package com.example.snsproject.controller.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserLoginRequest {
-
-    private String userName;
-    private String password;
+public class UserLoginResponse {
+    private String token;
 }

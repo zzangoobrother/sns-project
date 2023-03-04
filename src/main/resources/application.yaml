@@ -15,3 +15,9 @@ spring:
     password: ad531c5f532add1712a2f04e3dcd4662e447e74de80d82cc6d048e37f212bfe7
     platform: postgres
     driver-class-name: org.postgresql.Driver
+
+jwt:
+  secret:
+    key: fast_campus.sns-application-2023.secret_key
+  token:
+    expired-time-ms: 2592000000
