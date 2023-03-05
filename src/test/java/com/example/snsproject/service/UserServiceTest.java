@@ -15,7 +15,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -75,8 +74,6 @@ class UserServiceTest {
     void 로그인시_userName으로_회원가입한_유저가_없는경우() {
         String userName = "userName";
         String password = "password";
-
-        UserEntity fixture = UserEntityFixture.get(userName, password);
 
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.empty());
 
