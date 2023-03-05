@@ -34,7 +34,7 @@ class UserServiceTest {
         String userName = "userName";
         String password = "password";
 
-        UserEntity fixture = UserEntityFixture.get(userName, password);
+        UserEntity fixture = UserEntityFixture.get(userName, password, 1L);
 
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.empty());
         when(encoder.encode(password)).thenReturn("encrypt_password");
@@ -48,7 +48,7 @@ class UserServiceTest {
         String userName = "userName";
         String password = "password";
 
-        UserEntity fixture = UserEntityFixture.get(userName, password);
+        UserEntity fixture = UserEntityFixture.get(userName, password, 1L);
 
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(fixture));
         when(encoder.encode(password)).thenReturn("encrypt_password");
@@ -62,7 +62,7 @@ class UserServiceTest {
         String userName = "userName";
         String password = "password";
 
-        UserEntity fixture = UserEntityFixture.get(userName, password);
+        UserEntity fixture = UserEntityFixture.get(userName, password, 1L);
 
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(fixture));
         when(encoder.matches(password, fixture.getPassword())).thenReturn(true);
@@ -87,7 +87,7 @@ class UserServiceTest {
         String password = "password";
         String wrongPassword = "wrongPassword";
 
-        UserEntity fixture = UserEntityFixture.get(userName, password);
+        UserEntity fixture = UserEntityFixture.get(userName, password, 1L);
 
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(fixture));
 
