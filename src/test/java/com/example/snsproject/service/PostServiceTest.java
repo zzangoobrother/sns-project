@@ -2,6 +2,8 @@ package com.example.snsproject.service;
 
 import com.example.snsproject.exception.ErrorCode;
 import com.example.snsproject.exception.SnsApplicationException;
+import com.example.snsproject.fixture.PostEntityFixture;
+import com.example.snsproject.fixture.UserEntityFixture;
 import com.example.snsproject.model.entity.PostEntity;
 import com.example.snsproject.model.entity.UserEntity;
 import com.example.snsproject.repository.PostEntityRepository;
@@ -52,5 +54,55 @@ public class PostServiceTest {
 
         SnsApplicationException exception = assertThrows(SnsApplicationException.class, () -> postService.create(title, body, userName));
         assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
+    void 게시글수정이_성공한경우() {
+        String title = "title";
+        String body = "body";
+        String userName = "userName";
+        Long postId = 1L;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId);
+        UserEntity userEntity = postEntity.getUser();
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        assertDoesNotThrow(() -> postService.modify(postId, title, body, userName));
+    }
+
+    @Test
+    void 게시글수정시_게시글이_존재하지않는_경우() {
+        String title = "title";
+        String body = "body";
+        String userName = "userName";
+        Long postId = 1L;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId);
+        UserEntity userEntity = postEntity.getUser();
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.empty());
+
+        SnsApplicationException exception = assertThrows(SnsApplicationException.class, () -> postService.modify(postId, title, body, userName));
+        assertEquals(ErrorCode.POST_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
+    void 게시글수정시_권한이_없는_경우() {
+        String title = "title";
+        String body = "body";
+        String userName = "userName";
+        Long postId = 1L;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId);
+        UserEntity writer = UserEntityFixture.get("userName1", "password");
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(writer));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        SnsApplicationException exception = assertThrows(SnsApplicationException.class, () -> postService.modify(postId, title, body, userName));
+        assertEquals(ErrorCode.INVALID_PERMISSION, exception.getErrorCode());
     }
 }
