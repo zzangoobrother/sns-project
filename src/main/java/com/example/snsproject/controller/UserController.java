@@ -33,7 +33,7 @@ public class UserController {
         return Response.success(new UserLoginResponse(token));
     }
 
-    @GetMapping("/alaram")
+    @GetMapping("/alarm")
     public Response<Page<AlarmResponse>> alarm(Pageable pageable, Authentication authentication) {
         return Response.success(userService.alarmList(authentication.getName(), pageable).map(AlarmResponse::fromAlarm));
     }
