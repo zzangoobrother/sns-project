@@ -2,16 +2,11 @@ package com.example.snsproject.service;
 
 import com.example.snsproject.exception.ErrorCode;
 import com.example.snsproject.exception.SnsApplicationException;
+import com.example.snsproject.model.AlarmArgs;
 import com.example.snsproject.model.Comment;
 import com.example.snsproject.model.Post;
-import com.example.snsproject.model.entity.CommentEntity;
-import com.example.snsproject.model.entity.LikeEntity;
-import com.example.snsproject.model.entity.PostEntity;
-import com.example.snsproject.model.entity.UserEntity;
-import com.example.snsproject.repository.CommentEntityRepository;
-import com.example.snsproject.repository.LikeEntityRepository;
-import com.example.snsproject.repository.PostEntityRepository;
-import com.example.snsproject.repository.UserEntityRepository;
+import com.example.snsproject.model.entity.*;
+import com.example.snsproject.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +21,7 @@ public class PostService {
     private final UserEntityRepository userEntityRepository;
     private final LikeEntityRepository likeEntityRepository;
     private final CommentEntityRepository commentEntityRepository;
+    private final AlarmEntityRepository alarmEntityRepository;
 
     @Transactional
     public void create(String title, String body, String userName) {
@@ -78,6 +74,8 @@ public class PostService {
         });
 
         likeEntityRepository.save(LikeEntity.of(userEntity, postEntity));
+
+        alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(userEntity.getId(), postEntity.getId())));
     }
 
     public int likeCount(Long postId) {
@@ -91,6 +89,8 @@ public class PostService {
         PostEntity postEntity = getPostOrException(postId);
 
         commentEntityRepository.save(CommentEntity.of(userEntity, postEntity, comment));
+
+        alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postEntity.getId())));
     }
 
     public Page<Comment> getComments(Long postId, Pageable pageable) {
