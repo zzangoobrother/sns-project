@@ -11,7 +11,6 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class Alarm {
     private Long id;
-    private User user;
     private AlarmType alarmType;
     private AlarmArgs alarmArgs;
     private Timestamp registeredAt;
@@ -19,6 +18,6 @@ public class Alarm {
     private Timestamp deletedAt;
 
     public static Alarm fromEntity(AlarmEntity entity) {
-        return new Alarm(entity.getId(), User.fromEntity(entity.getUser()), entity.getAlarmType(), entity.getArgs(), entity.getRegisteredAt(), entity.getUpdatedAt(), entity.getDeletedAt());
+        return new Alarm(entity.getId(), entity.getAlarmType(), entity.getArgs(), entity.getRegisteredAt(), entity.getUpdatedAt(), entity.getDeletedAt());
     }
 }

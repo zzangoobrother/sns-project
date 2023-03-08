@@ -5,8 +5,10 @@ import com.example.snsproject.controller.request.UserLoginRequest;
 import com.example.snsproject.exception.ErrorCode;
 import com.example.snsproject.exception.SnsApplicationException;
 import com.example.snsproject.model.User;
+import com.example.snsproject.model.entity.UserEntity;
 import com.example.snsproject.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -38,6 +41,14 @@ public class UserControllerTest {
 
     @MockBean
     private UserService userService;
+
+    UserEntity userEntity;
+
+    @BeforeEach
+    void setUp() {
+        userEntity = UserEntity.of("", "");
+        userEntity.setId(1L);
+    }
 
     @Test
     void 회원가입() throws Exception {
@@ -115,6 +126,7 @@ public class UserControllerTest {
         when(userService.alarmList(any(), any())).thenReturn(Page.empty());
 
         mockMvc.perform(get("/api/v1/users/alarm")
+                        .with(SecurityMockMvcRequestPostProcessors.user(User.fromEntity(userEntity)))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());

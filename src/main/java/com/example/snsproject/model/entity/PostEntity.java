@@ -12,7 +12,9 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"post\"")
+@Table(name = "\"post\"", indexes = {
+        @Index(name = "post_user_id_idx", columnList = "user_id")
+})
 @SQLDelete(sql = "UPDATE \"post\" SET deleted_at = NOW() WHERE ID=?")
 @Where(clause = "deleted_at is NULL")
 public class PostEntity {
@@ -27,7 +29,7 @@ public class PostEntity {
     @Column(name = "body", columnDefinition = "TEXT")
     private String body;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
 

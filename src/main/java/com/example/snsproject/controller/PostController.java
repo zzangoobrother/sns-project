@@ -6,11 +6,13 @@ import com.example.snsproject.controller.response.CommentResponse;
 import com.example.snsproject.controller.response.PostResponse;
 import com.example.snsproject.controller.response.Response;
 import com.example.snsproject.model.Post;
+import com.example.snsproject.model.User;
 import com.example.snsproject.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,26 +28,26 @@ public class PostController {
         return Response.success();
     }
 
-    @PutMapping("/{postId}")
-    public Response<PostResponse> modify(@PathVariable Long postId, @RequestBody PostCreateRequest request, Authentication authentication) {
-        Post post = postService.modify(postId, request.getTitle(), request.getBody(), authentication.getName());
-        return Response.success(PostResponse.fromPost(post));
-    }
-
-    @DeleteMapping("/{postId}")
-    public Response<Void> delete(@PathVariable Long postId, Authentication authentication) {
-        postService.delete(authentication.getName(), postId);
-        return Response.success();
-    }
-
     @GetMapping
-    public Response<Page<PostResponse>> list(Pageable pageable, Authentication authentication) {
+    public Response<Page<PostResponse>> list(Pageable pageable) {
         return Response.success(postService.list(pageable).map(PostResponse::fromPost));
     }
 
     @GetMapping("/my")
-    public Response<Page<PostResponse>> my(Pageable pageable, Authentication authentication) {
-        return Response.success(postService.my(authentication.getName(), pageable).map(PostResponse::fromPost));
+    public Response<Page<PostResponse>> my(Pageable pageable, @AuthenticationPrincipal User user) {
+        return Response.success(postService.my(user.getId(), pageable).map(PostResponse::fromPost));
+    }
+
+    @PutMapping("/{postId}")
+    public Response<PostResponse> modify(@PathVariable Long postId, @RequestBody PostCreateRequest request, @AuthenticationPrincipal User user) {
+        Post post = postService.modify(postId, request.getTitle(), request.getBody(), user.getId());
+        return Response.success(PostResponse.fromPost(post));
+    }
+
+    @DeleteMapping("/{postId}")
+    public Response<Void> delete(@PathVariable Long postId, @AuthenticationPrincipal User user) {
+        postService.delete(user.getId(), postId);
+        return Response.success();
     }
 
     @PostMapping("/{postId}/likes")
@@ -55,7 +57,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}/likes")
-    public Response<Integer> likeCount(@PathVariable Long postId, Authentication authentication) {
+    public Response<Integer> likeCount(@PathVariable Long postId) {
         return Response.success(postService.likeCount(postId));
     }
 

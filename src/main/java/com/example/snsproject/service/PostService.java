@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @AllArgsConstructor
 public class PostService {
@@ -30,12 +32,11 @@ public class PostService {
     }
 
     @Transactional
-    public Post modify(Long postId, String title, String body, String userName) {
-        UserEntity userEntity = getUserOrException(userName);
+    public Post modify(Long postId, String title, String body, Long userId) {
         PostEntity postEntity = getPostOrException(postId);
 
-        if (postEntity.getUser() != userEntity) {
-            throw new SnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", userName, postId));
+        if (!Objects.equals(postEntity.getUser().getId(), userId)) {
+            throw new SnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with %s", userId, postId));
         }
 
         postEntity.setTitle(title);
@@ -44,13 +45,16 @@ public class PostService {
         return Post.fromEntity(postEntity);
     }
 
-    public void delete(String userName, Long postId) {
-        UserEntity userEntity = getUserOrException(userName);
+    @Transactional
+    public void delete(Long userId, Long postId) {
         PostEntity postEntity = getPostOrException(postId);
 
-        if (postEntity.getUser() != userEntity) {
-            throw new SnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", userName, postId));
+        if (!Objects.equals(postEntity.getUser().getId(), userId)) {
+            throw new SnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with %s", userId, postId));
         }
+
+        likeEntityRepository.deleteAllByPost(postEntity);
+        commentEntityRepository.deleteAllByPost(postEntity);
 
         postEntityRepository.delete(postEntity);
     }
@@ -59,9 +63,8 @@ public class PostService {
         return postEntityRepository.findAll(pageable).map(Post::fromEntity);
     }
 
-    public Page<Post> my(String userName, Pageable pageable) {
-        UserEntity userEntity = getUserOrException(userName);
-        return postEntityRepository.findAllByUser(userEntity, pageable).map(Post::fromEntity);
+    public Page<Post> my(Long userId, Pageable pageable) {
+        return postEntityRepository.findAllByUserId(userId, pageable).map(Post::fromEntity);
     }
 
     @Transactional
