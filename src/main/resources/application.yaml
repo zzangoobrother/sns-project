@@ -18,6 +18,9 @@ spring:
     platform: postgres
     driver-class-name: org.postgresql.Driver
 
+  redis:
+    url:  redis://:p9f0a55813d037f316d8346e66e443e8846158102c0fac3c86c9646870022e355@ec2-44-207-143-113.compute-1.amazonaws.com:32159
+
 jwt:
   secret:
     key: fast_campus.sns-application-2023.secret_key
