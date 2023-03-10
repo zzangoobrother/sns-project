@@ -21,6 +21,28 @@ spring:
   redis:
     url:  redis://:p9f0a55813d037f316d8346e66e443e8846158102c0fac3c86c9646870022e355@ec2-44-207-143-113.compute-1.amazonaws.com:32159
 
+  kafka:
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: SCRAM-SHA-256
+      sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username="nyehwawn" password="W6dvrU_nPqbV9u14-0TQgPLzOGDAe7TX";
+    consumer:
+      bootstrap-servers: dory-01.srvs.cloudkafka.com:9094, dory-02.srvs.cloudkafka.com:9094, dory-03.srvs.cloudkafka.com:9094, dory-04.srvs.cloudkafka.com:9094, dory-05.srvs.cloudkafka.com:9094
+      group-id: nyehwawn-alarm
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.LongDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties.spring.json.trusted.packages: "*"
+    listener:
+      ack-mode: manual
+    producer:
+      bootstrap-servers: dory-01.srvs.cloudkafka.com:9094, dory-02.srvs.cloudkafka.com:9094, dory-03.srvs.cloudkafka.com:9094
+      key-serializer: org.apache.kafka.common.serialization.LongSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties.enable.idempotence: false
+    topic:
+      alarm: nyehwawn-alarm
+
 jwt:
   secret:
     key: fast_campus.sns-application-2023.secret_key
